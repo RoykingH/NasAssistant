@@ -1,0 +1,20 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+Thumbs.db
+
+# 本地 AI 工作记忆与临时渲染产物（非工程源码）
+.workbuddy/
+.smoke/
+
+# 宣传物料旧版本留档（git 历史里已有，不重复入库）
+promo/**/.old-*/
+
+# 设计稿像素分析脚本（临时）
+.uidbg/
+
+# 本地素材（设计稿 / 宣传物料 / 独立预览版）不入库
+ui/
+ui-widget/
+promo/

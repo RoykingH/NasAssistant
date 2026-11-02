@@ -1,0 +1,137 @@
+/* ============================================================================
+   NAS桌面助手 · 时钟卡片（top 组件）
+   设计稿 ui/top.png：卡片 1162×900。运行时窗口 155×140。
+     --bw = 内容基准宽（固定 160px，不随窗口变化）：内部字体/组件尺寸保持原样
+     --d  = 设计单位（--bw/1162）：字号、横向位置按它等比换算
+     --dy = 设计单位（卡片高/900）：纵向位置按它映射
+     --pr = 参考宽度 155px 的倍数（应用端窗口 155 宽 ⇒ 1）：按 px 给的横向尺寸
+     --pv = 参考高度 140px 的倍数（应用端窗口 140 高 ⇒ 1）：按 px 给的纵向尺寸
+     --k  = 环形组文字放大倍数（环内数值 / 环下标签）
+   （宽度与高度比例不同，所以横向用 --d/--pr、纵向用 --dy/--pv，避免圆环被压扁。）
+   ========================================================================== */
+
+/* ---- 内嵌字体：M PLUS Rounded 1c（SIL OFL 1.1）----
+   已切成只含组件实际用到字符的子集（0-9 C P U R A M D I S K %），两份约 5.7KB。 */
+@font-face{ font-family:'M PLUS Rounded 1c'; font-style:normal; font-weight:500;
+  font-display:block; src:url(fonts/mplus-rounded-500.woff2) format('woff2'); }
+@font-face{ font-family:'M PLUS Rounded 1c'; font-style:normal; font-weight:700;
+  font-display:block; src:url(fonts/mplus-rounded-700.woff2) format('woff2'); }
+
+:root{
+  --w: 100vw;                                   /* 卡片宽度＝窗口宽度（主进程设为 155px） */
+  --h: 100vh;                                   /* 卡片高度＝窗口高度（主进程设为 140px） */
+  --bw: 160px;                                  /* ★ 内容基准宽：固定 160，窗口变小时内部不跟着缩 */
+  --d: calc(var(--bw) / 1162);                  /* 设计单位：字号 / 横向位置 */
+  --dy: calc(var(--h) / 900);                   /* 设计单位：纵向位置 */
+  --pr: calc(var(--w) / 155);                   /* ★ 参考宽度 155 的倍数（应用端 = 1） */
+  --pv: calc(var(--h) / 140);                   /* ★ 参考高度 140 的倍数（应用端 = 1） */
+  --xoff: calc((var(--bw) - var(--w)) / 2);     /* 内容基准比卡片宽出的部分 → 整体左移，保持视觉居中 */
+  --k: 1.2;                                     /* ★ 环形组文字放大倍数（环内数值 / 环下标签） */
+  --ring: calc(38 * var(--pr));                 /* ★ 环外径 38px */
+  --panelh: calc(65 * var(--pv));               /* ★ 面板高度 65px */
+  --pctfs: calc(62 * var(--k) * var(--d));      /* 环心数值字号 */
+  --lblfs: calc(48 * var(--k) * var(--d));      /* 环下标签字号 */
+  --gb: calc(5 * var(--h) / 140);               /* ★ 环形组（含环下标签）文字底距卡片底 5px */
+  /* 字形底 ≠ 行盒底：M PLUS 上下行度量之和 > 1em，line-height:1 时行盒底比字形底低约 0.154em
+     ⇒ 把行盒底再往下推这么多，字形底才正好落在 5px 处（实测：不补偿会是 7px） */
+  --gbx: calc(var(--gb) - 0.154 * var(--lblfs));
+  --rad: calc(145 * var(--d));                  /* 外框圆角；圆环面板用同值 */
+  --font: 'M PLUS Rounded 1c', 'Segoe UI Variable Display', 'Segoe UI',
+          system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html,body{ height:100%; background:transparent; overflow:hidden; }
+body{
+  font-family:var(--font);
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  user-select:none; cursor:default;
+}
+body.grabbing{ cursor:grabbing; }
+
+/* ================= 卡片 ================= */
+.widget{
+  position:relative;
+  width:var(--w); height:var(--h);
+  border-radius:var(--rad);
+  overflow:hidden;
+  background:#000000;                                   /* 纯黑，无渐变、无投影 */
+  color:#fff;
+}
+/* 极细高光描边（伪元素画在最上层，避免被下方面板盖住） */
+.widget::after{
+  content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+  box-shadow:inset 0 0 0 calc(1.5 * var(--d)) rgba(255,255,255,.07);
+}
+
+/* ================= 时钟 ================= */
+.clock{
+  position:absolute; left:0; right:0; top:calc(250 * var(--dy));
+  transform:translate(calc(-7 * var(--d)), -50%);       /* 视觉居中微调 */
+  display:flex; align-items:center; justify-content:center;
+  font-size:calc(363 * var(--d));
+  font-weight:500; line-height:1;
+  white-space:nowrap;
+}
+.g{ margin-right:calc(-12 * var(--d)); }                /* 数字之间收紧 */
+.g:last-child{ margin-right:0; }
+/* 每个数字纯色填充（不做渐变） */
+.g1{ color:#3f8ef7; }   /* 时 · 十位 */
+.g2{ color:#46b6fb; }   /* 时 · 个位 */
+.g3{ color:#57dd9b; }   /* 分 · 十位 */
+.g4{ color:#f4c94b; }   /* 分 · 个位 */
+
+/* 冒号：独立元素，放在小时与分钟之间；两颗圆点 */
+.cln{ display:flex; flex-direction:column; align-items:center;
+      gap:calc(50 * var(--d)); margin:0 calc(20 * var(--d)); flex:none; }
+.cln i{ display:block; width:calc(56 * var(--d)); height:calc(56 * var(--d));
+        border-radius:50%; background:#e8eef6; transition:opacity .3s; }
+body.offline .cln i{ opacity:.35; }
+
+/* 圆环背后的圆角面板：宽度与组件同宽、高 65px，圆角与组件同值 */
+.panel{
+  position:absolute; left:0; right:0; bottom:0; height:var(--panelh);
+  border-radius:var(--rad);
+  background:rgba(255,255,255,.08);                     /* 纯色叠加，无渐变（灰度比之前浅一档） */
+}
+
+/* ================= 三个环形 ================= */
+/* 位置锚在卡片底部：环心 y = 高 − --gbx（底部留白）− 172*--dy（环心→标签中心）− 半个标签行高
+   横向：设计稿圆心 x = 226/581/938（按 --d），再减去 --xoff 做整体居中补偿 */
+.ring{
+  position:absolute; width:var(--ring); height:var(--ring);
+  top:calc(var(--h) - var(--gbx) - 172 * var(--dy) - 0.5 * var(--lblfs));
+  left:var(--cx);
+  transform:translate(-50%,-50%);
+}
+.dial{ width:100%; height:100%; display:block; }
+.trk{ fill:none; stroke:#4b4e52; stroke-width:9.5; }    /* 轨道灰，与简约条一致 */
+/* 弧线用 path 绘制（逆时针），颜色与简约条一致 */
+.arc{
+  fill:none; stroke-width:9.5; stroke-linecap:round;
+  transition:stroke-dasharray .85s cubic-bezier(.22,.7,.3,1);
+}
+.ring.r-cpu  .arc{ stroke:#4a5efb; }
+.ring.r-ram  .arc{ stroke:#05f70d; }
+.ring.r-disk .arc{ stroke:#fca817; }
+
+.ring.r-cpu  .dial{ filter:drop-shadow(0 0 calc(5 * var(--d)) rgba(74,94,251,.30)); }
+.ring.r-ram  .dial{ filter:drop-shadow(0 0 calc(5 * var(--d)) rgba(5,247,13,.24)); }
+.ring.r-disk .dial{ filter:drop-shadow(0 0 calc(5 * var(--d)) rgba(252,168,23,.26)); }
+
+/* 环形中央数值 */
+.pct{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  padding-top:calc(10 * var(--dy));
+  font-size:var(--pctfs); font-weight:700; color:#ffffff;
+  letter-spacing:calc(-1.2 * var(--d));
+  text-shadow:0 calc(1 * var(--d)) calc(5 * var(--d)) rgba(0,0,0,.45);
+}
+/* 环形下方标签：相对容器顶 = 环半径 + 172*--dy（环心→标签中心，位置不变，只放大字号） */
+.lbl{
+  position:absolute; left:50%; top:calc(172 * var(--dy) + var(--ring) / 2);
+  transform:translate(-50%,-50%); white-space:nowrap; line-height:1;
+  font-size:var(--lblfs); font-weight:500; letter-spacing:calc(1.8 * var(--d));
+  color:#c9ced6; text-shadow:0 calc(1 * var(--d)) calc(4 * var(--d)) rgba(0,0,0,.35);
+}
+/* 未连接：整体压暗 */
+body.offline .ring{ opacity:.5; }

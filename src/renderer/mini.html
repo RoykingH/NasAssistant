@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:;" />
+  <title>NAS桌面助手 · 简约条</title>
+  <link rel="stylesheet" href="mini.css" />
+</head>
+<body>
+  <div class="bar" id="bar" title="单击展开详情面板 · 按住左右拖动可移动位置">
+    <!-- 几何为 ui/top_mini.png 的 1/2 等比缩放（原 547×112 → 274×56） -->
+    <svg class="stage" id="stage" viewBox="0 0 274 56" width="274" height="56" aria-hidden="true">
+      <!-- 翼形吸附底：顶部贴屏幕边、底部收窄。
+           底色取自设计稿实测值（#020305 系），为统一纯色，不加渐变与投影。 -->
+      <path id="shape"
+            d="M4,0 C5,0.4 8.15,1.5 10,2.5 C11.85,3.5 13.35,4.4 15,6 C16.65,7.6 18.35,9.6 20,12 C21.65,14.4 23.35,17.75 25,20.5 C26.65,23.25 28.35,25.75 30,28.5 C31.65,31.25 33.35,34.5 35,37 C36.65,39.5 38.35,41.85 40,43.5 C41.65,45.15 43.35,46.1 45,47 C46.65,47.9 48.35,48.5 50,49 C51.65,49.5 54.15,49.85 55,50 L216.5,50 C217.35,49.85 219.85,49.5 221.5,49 C223.15,48.5 224.85,47.9 226.5,47 C228.15,46.1 229.85,45.15 231.5,43.5 C233.15,41.85 234.85,39.5 236.5,37 C238.15,34.5 239.85,31.25 241.5,28.5 C243.15,25.75 244.85,23.25 246.5,20.5 C248.15,17.75 249.85,14.4 251.5,12 C253.15,9.6 254.85,7.6 256.5,6 C258.15,4.4 259.65,3.5 261.5,2.5 C263.35,1.5 266.5,0.4 267.5,0 Z"
+            fill="#030507" />
+      <path class="edge"
+            d="M4,0 C5,0.4 8.15,1.5 10,2.5 C11.85,3.5 13.35,4.4 15,6 C16.65,7.6 18.35,9.6 20,12 C21.65,14.4 23.35,17.75 25,20.5 C26.65,23.25 28.35,25.75 30,28.5 C31.65,31.25 33.35,34.5 35,37 C36.65,39.5 38.35,41.85 40,43.5 C41.65,45.15 43.35,46.1 45,47 C46.65,47.9 48.35,48.5 50,49 C51.65,49.5 54.15,49.85 55,50 L216.5,50 C217.35,49.85 219.85,49.5 221.5,49 C223.15,48.5 224.85,47.9 226.5,47 C228.15,46.1 229.85,45.15 231.5,43.5 C233.15,41.85 234.85,39.5 236.5,37 C238.15,34.5 239.85,31.25 241.5,28.5 C243.15,25.75 244.85,23.25 246.5,20.5 C248.15,17.75 249.85,14.4 251.5,12 C253.15,9.6 254.85,7.6 256.5,6 C258.15,4.4 259.65,3.5 261.5,2.5 C263.35,1.5 266.5,0.4 267.5,0"
+            fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1" />
+
+      <!-- 环形仪表：CPU / RAM / DISK（12 点起逆时针扫过），文字标签置于环下方。
+           圆心间距 70 → 64（按要求再收紧 6px），整体保持居中。 -->
+      <g class="rings" id="rings">
+        <g class="ring" data-ring="cpu">
+          <circle class="track" cx="71.75" cy="21" r="16" />
+          <path class="arc" id="arcCpu" />
+          <text class="val" id="valCpu" x="71.75" y="21">—</text>
+          <text class="lab" x="71.75" y="43.5">CPU</text>
+        </g>
+        <g class="ring" data-ring="ram">
+          <circle class="track" cx="135.75" cy="21" r="16" />
+          <path class="arc" id="arcRam" />
+          <text class="val" id="valRam" x="135.75" y="21">—</text>
+          <text class="lab" x="135.75" y="43.5">RAM</text>
+        </g>
+        <g class="ring" data-ring="disk">
+          <circle class="track" cx="199.75" cy="21" r="16" />
+          <path class="arc" id="arcDisk" />
+          <text class="val" id="valDisk" x="199.75" y="21">—</text>
+          <text class="lab" x="199.75" y="43.5">DISK</text>
+        </g>
+      </g>
+    </svg>
+  </div>
+
+  <script src="mini.js"></script>
+</body>
+</html>

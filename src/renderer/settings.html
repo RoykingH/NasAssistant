@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;" />
+  <title>NAS桌面助手 · 设置</title>
+  <link rel="stylesheet" href="settings.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="topbar">
+      <h1 id="title">NAS桌面助手 · 设置</h1>
+      <span class="ver" id="ver"></span>
+    </header>
+
+    <!-- ========================= 服务器列表 ========================= -->
+    <section class="block">
+      <div class="block-hd">
+        <span class="block-title">服务器</span>
+        <span class="block-sub" id="srvCount"></span>
+      </div>
+      <div class="srv-list" id="srvList"></div>
+      <!-- 底部虚线框：添加服务器 -->
+      <button class="srv-add" id="btnAdd" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        添加服务器
+      </button>
+    </section>
+
+    <!-- ========================= 通用设置 ========================= -->
+    <section class="block">
+      <div class="block-hd"><span class="block-title">通用设置</span></div>
+      <div class="grid2">
+        <div>
+          <label class="lb" for="interval">刷新间隔</label>
+          <select class="in" id="interval">
+            <option value="2000">2 秒</option>
+            <option value="3000">3 秒</option>
+            <option value="5000">5 秒</option>
+            <option value="10000">10 秒</option>
+            <option value="30000">30 秒</option>
+          </select>
+        </div>
+        <div class="checks">
+          <label class="ck"><input type="checkbox" id="alwaysOnTop" /> <span>挂件窗口置顶</span></label>
+          <label class="ck"><input type="checkbox" id="autoStart" /> <span>开机自动启动</span></label>
+        </div>
+      </div>
+    </section>
+
+    <div class="foot">
+      文档：<a id="docsLink" href="https://docs.unraid.net/API/how-to-use-the-api/">docs.unraid.net/API</a>
+    </div>
+  </div>
+
+  <!-- ===================== 添加 / 编辑服务器弹层 ===================== -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal-mask" id="modalMask"></div>
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+      <div class="modal-hd">
+        <span id="mTitle">添加服务器</span>
+        <button class="modal-x" id="mClose" type="button" title="关闭">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <label class="lb">服务器类型</label>
+        <div class="seg" id="typeSeg" role="radiogroup" aria-label="服务器类型">
+          <button class="seg-btn is-on" type="button" data-type="unraid" role="radio" aria-checked="true">Unraid</button>
+          <button class="seg-btn" type="button" data-type="proxmox" role="radio" aria-checked="false">Proxmox VE</button>
+          <button class="seg-btn" type="button" data-type="dsm" role="radio" aria-checked="false">Synology DSM</button>
+          <button class="seg-btn" type="button" data-type="fnos" role="radio" aria-checked="false">飞牛 fnOS</button>
+        </div>
+        <div class="hint" id="typeHint">通过 Unraid 官方 GraphQL API 读写（需 ADMIN 角色密钥）。</div>
+
+        <label class="lb" for="name">名称 <span class="opt">（可选）</span></label>
+        <input class="in" id="name" type="text" spellcheck="false" placeholder="例如：机房主机 / 塔机" />
+
+        <!-- 一个输入框两用：fnOS 既可填地址、也可直接填 FN ID -->
+        <label class="lb" for="url" id="urlLabel">服务器地址</label>
+        <input class="in" id="url" type="text" spellcheck="false" placeholder="http://192.168.1.10  或  https://tower.local" />
+        <div class="hint" id="urlHint">支持填写 IP、主机名或完整 GraphQL 地址；未填 <code>/graphql</code> 时会自动补全。</div>
+
+        <!-- ===== API Key / Token 模式（Unraid / Proxmox VE） ===== -->
+        <div id="keyBlock">
+          <label class="lb" for="apiKey" id="keyLabel">API Key</label>
+          <div class="row">
+            <input class="in" id="apiKey" type="password" spellcheck="false" placeholder="在 Unraid 中生成，需要 ADMIN 角色" />
+            <button class="btn ghost" id="btnEye" type="button" title="显示 / 隐藏">显示</button>
+          </div>
+          <div class="hint" id="keyHint">
+            获取方式：Unraid WebGUI → <b>设置 → 管理访问 → API Keys</b> 新建一个 ADMIN 角色的密钥；
+            或命令行 <code>unraid-api apikey --create --name widget --roles ADMIN --json</code>。
+          </div>
+        </div>
+
+        <!-- ===== 账号密码模式（Synology DSM） ===== -->
+        <div id="loginBlock" hidden>
+          <label class="lb" for="username">账号</label>
+          <input class="in" id="username" type="text" spellcheck="false" placeholder="DSM 登录账号（例如 admin）" />
+          <label class="lb" for="password">密码</label>
+          <div class="row">
+            <input class="in" id="password" type="password" spellcheck="false" placeholder="DSM 登录密码" />
+            <button class="btn ghost" id="btnEyePwd" type="button" title="显示 / 隐藏">显示</button>
+          </div>
+          <label class="lb" for="otpCode">两步验证码 <span class="opt">（可选）</span></label>
+          <input class="in" id="otpCode" type="text" inputmode="numeric" spellcheck="false" placeholder="若已开启双重验证则填写 6 位动态码" />
+          <div class="hint" id="loginHint">
+            使用 DSM 账号密码登录（非 API Key）。若账号已开启双重验证，登录时可能要求填写动态验证码；
+            请先在 DSM <b>控制面板 → 安全性 → 账户</b> 中确认该账号允许登录。
+          </div>
+        </div>
+
+        <!-- PVE 专用：拆分填写 token（可选） -->
+        <div id="pveExtra" hidden>
+          <label class="lb" for="tokenId">Token ID <span class="opt">（可选）</span></label>
+          <input class="in" id="tokenId" type="text" spellcheck="false" placeholder="root@pam!widget" />
+          <div class="hint">
+            可留空：此时请把 <code>user@realm!tokenid=secret</code> 整串填到上面的 API Token 框。
+            若分开填，则此处填 <code>user@realm!tokenid</code>，上面只填 secret。
+          </div>
+        </div>
+
+        <label class="ck"><input type="checkbox" id="allowSelfSigned" /> <span>允许自签名证书</span></label>
+
+        <div class="result" id="result" hidden></div>
+      </div>
+
+      <div class="modal-foot">
+        <button class="btn ghost" id="btnTest" type="button">测试连接</button>
+        <div class="spacer"></div>
+        <button class="btn primary" id="btnSave" type="button">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="settings.js"></script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+/* Unraid 顶部简约条 —— 吸附屏幕顶部的翼形挂件（274×56，设计稿 1/2 缩放） */
+:root {
+  /* 配色取自设计稿 ui/top_mini.png 实测值 */
+  --arc-cpu:  #4a5efb;   /* CPU 环（蓝） */
+  --arc-ram:  #05f70d;   /* RAM 环（绿） */
+  --arc-disk: #fca817;   /* DISK 环（琥珀） */
+  --track:    #4b4e52;   /* 环形轨道灰 */
+  --fg:       #ffffff;
+  --lab:      #c9ced6;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+  user-select: none;
+  cursor: default;
+  font-family: "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.bar {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: pointer;
+}
+.bar.grabbing { cursor: grabbing; }
+
+.stage { display: block; width: 100%; height: 100%; }
+
+.edge { pointer-events: none; transition: stroke-opacity .18s; }
+.bar:hover .edge { stroke-opacity: .2; }
+
+/* ------------------------------------------------------------------ 环形仪表 */
+.ring .track {
+  fill: none;
+  stroke: var(--track);
+  stroke-width: 4.5;
+}
+/* 弧线本身不加任何发光 / 投影 */
+.ring .arc {
+  fill: none;
+  stroke-width: 4.5;
+  stroke-linecap: round;
+}
+.ring[data-ring="cpu"]  .arc { stroke: var(--arc-cpu); }
+.ring[data-ring="ram"]  .arc { stroke: var(--arc-ram); }
+.ring[data-ring="disk"] .arc { stroke: var(--arc-disk); }
+
+.ring .val {
+  font-size: 9.5px;
+  font-weight: 700;
+  fill: var(--fg);
+  text-anchor: middle;
+  dominant-baseline: middle;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.2px;
+}
+/* 标签在环形下方 */
+.ring .lab {
+  font-size: 8px;
+  font-weight: 500;
+  fill: var(--lab);
+  text-anchor: middle;
+  dominant-baseline: middle;
+  letter-spacing: 0.5px;
+}
+
+/* ------------------------------------------------------------------ 展开提示
+   底边只留 6px 余量，放不下独立的展开箭头（会与 RAM 标签重叠），
+   改为「悬停时底边描边变亮」提示可点击，文案由 title 提示承担。 */
+.bar:hover .ring .lab { fill: #eef3f9; }
+
+/* 离线 / 未配置状态：整体降亮度 */
+.bar.offline .ring .val { fill: #8a939e; }

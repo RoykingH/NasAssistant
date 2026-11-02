@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:;" />
+  <title>NAS桌面助手 · 时钟卡片</title>
+  <link rel="stylesheet" href="top.css" />
+</head>
+<body>
+  <!-- 155×140 时钟卡片：时钟 + CPU/RAM/DISK 三个逆时针环
+       单击展开详情面板；按住可拖动（位置记忆在 topBounds） -->
+  <div class="widget" id="widget" title="单击展开详情面板 · 按住可拖动">
+    <!-- 时钟：每个数字独立元素，纯色填充（无渐变） -->
+    <div class="clock">
+      <span class="g g1">1</span>
+      <span class="g g2">9</span>
+      <span class="cln"><i></i><i></i></span>
+      <span class="g g3">1</span>
+      <span class="g g4">5</span>
+    </div>
+
+    <!-- 圆环背后的圆角面板（与组件同宽、同圆角） -->
+    <div class="panel"></div>
+
+    <!-- 三个环形：CPU / RAM / DISK（弧从 12 点起逆时针扫过） -->
+    <div class="ring r-cpu" style="--cx:calc(226 * var(--d) - var(--xoff))">
+      <svg class="dial" viewBox="0 0 100 100" aria-hidden="true">
+        <circle class="trk" cx="50" cy="50" r="45.25"/>
+        <path class="arc" data-ring="cpu"
+              d="M 50 4.75 A 45.25 45.25 0 1 0 50 95.25 A 45.25 45.25 0 1 0 50 4.75"/>
+      </svg>
+      <div class="pct" id="pctCpu">—</div>
+      <div class="lbl">CPU</div>
+    </div>
+
+    <div class="ring r-ram" style="--cx:calc(581 * var(--d) - var(--xoff))">
+      <svg class="dial" viewBox="0 0 100 100" aria-hidden="true">
+        <circle class="trk" cx="50" cy="50" r="45.25"/>
+        <path class="arc" data-ring="ram"
+              d="M 50 4.75 A 45.25 45.25 0 1 0 50 95.25 A 45.25 45.25 0 1 0 50 4.75"/>
+      </svg>
+      <div class="pct" id="pctRam">—</div>
+      <div class="lbl">RAM</div>
+    </div>
+
+    <div class="ring r-disk" style="--cx:calc(938 * var(--d) - var(--xoff))">
+      <svg class="dial" viewBox="0 0 100 100" aria-hidden="true">
+        <circle class="trk" cx="50" cy="50" r="45.25"/>
+        <path class="arc" data-ring="disk"
+              d="M 50 4.75 A 45.25 45.25 0 1 0 50 95.25 A 45.25 45.25 0 1 0 50 4.75"/>
+      </svg>
+      <div class="pct" id="pctDisk">—</div>
+      <div class="lbl">DISK</div>
+    </div>
+  </div>
+
+  <script src="top.js"></script>
+</body>
+</html>
